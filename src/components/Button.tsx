@@ -3,10 +3,9 @@ type ButtonProps = {
     onClick: () => void;
 }
 
-export const Button = ({ text }: ButtonProps) => {
+export const Button = ({ text, onClick }: ButtonProps) => {
     return (
-        <div>
-            <button type='button' className='m-1'>{text}</button>
-        </div>
+        <button type='button' onClick={onClick} 
+            className='col-span-1 col-start-3 rounded-full m-1 bg-blue-500'>{text}</button>
     )
 }
