@@ -18,7 +18,7 @@ function App() {
 
     useEffect(() => {
         fetchVenueStaticData(slugs)
-        .then(set)
+            .then(setAvailableVenues)
 
     }, [])
 
