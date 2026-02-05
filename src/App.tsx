@@ -4,22 +4,28 @@ import { Input } from './components/Input'
 import React, { useState, useEffect } from 'react'
 import { fetchVenueStaticData } from './services/fetchVenueStaticData'
 
+type Venue = {
+    name: string,
+    latitude: number,
+    longitude: number
+}
+
 function App() {
     const [venue, setVenue] = useState('Select your venue');
     const [cartValue, setCartValue] = useState('Insert cart value');
     const [latitude, setLatitude] = useState('Insert your latitude');
     const [longitude, setLongitude] = useState('Insert your longitude');
-    const [availableVenues, setAvailableVenues] = useState([])
     const [loading, setLoading] = useState(false);
-    const slugs = [
+    const [availableVenues, setAvailableVenues] = useState<Venue>([])
+    const venueSlugs = [
         'home-assignment-venue-helsinki',
         'home-assignment-venue-tallinn'
     ]
 
     useEffect(() => {
-        fetchVenueStaticData(slugs)
+        fetchVenueStaticData(venueSlugs)
             .then(setAvailableVenues)
-
+            .catch(console.error)
     }, [])
 
     const handleClick = (event: React.ChangeEvent<HTMLInputElement>) => {
