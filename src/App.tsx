@@ -30,11 +30,15 @@ function App() {
             .catch(console.error)
     }, [])
 
-    console.log('Available venues:', availableVenues);
+    // console.log('Available venues:', availableVenues);
 
     // const handleClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     //     console.log('CLICK');
     // }
+
+    const handleVenueOptionClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setVenue(event.target.value);
+    }
 
     const onLocationClick = () => {
 
@@ -65,9 +69,9 @@ function App() {
     return (
         <div className='min-h-screen min-w-screen bg-[#00C2E8]'>
             <h1 className='text-white flex justify-center p-5'>Delivery Order Price Calculator</h1>
-            <div className='grid grid-cols-5 gap-1'>
+            <div className='grid grid-cols-5 relative gap-1'>
                 <VenueInputField label='venueSlug' text='Venue' value={venue} 
-                    onChange={(e) => handleInput(e, 'venue')} />
+                    onChange={(e) => handleInput(e, 'venue')} onClick={handleVenueOptionClick} />
                 <InputField label='cartValue' text='Cart value' value={cartValue} placeholder='Insert cart value' 
                     onChange={(e) => handleInput(e, 'cart')} />
                 <InputField label='userLatitude' text='Latitude' value={latitude} placeholder='Insert your latitude' 

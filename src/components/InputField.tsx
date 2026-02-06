@@ -10,8 +10,10 @@ export const InputField = ({ label, text, value, placeholder, onChange }: InputP
     return (
         <>
             <label htmlFor={label} className='flex col-start-2 items-center justify-end-safe text-white'>{text}</label>
-            <input id={label} type='text' value={value} placeholder={placeholder} pattern='^[A-Za-z0-9]+$' onChange={onChange}
-                className='col-start-3 border-1 border-black rounded m-1 pl-1 text-gray-700 bg-white' />
+            <div className='col-start-3'>
+                <input id={label} type='text' value={value} placeholder={placeholder} pattern='^[A-Za-z0-9]+$' onChange={onChange}
+                    className='border-1 border-black rounded m-1 pl-1 text-black bg-white' />
+            </div>    
         </>
     )
 }
