@@ -1,3 +1,5 @@
+import type { Venue } from '../App.tsx'
+
 export const fetchVenueStaticData = async (venueSlugs: string[]) => {
     try {
         const availableVenues = [];
@@ -10,7 +12,13 @@ export const fetchVenueStaticData = async (venueSlugs: string[]) => {
                 throw new Error('Unable to get a venue');
             }
 
-            const newVenue = await response.json();
+            const rawData = await response.json();
+            const newVenue: Venue = {
+                name: rawData.venue_raw.name,
+                slug: rawData.venue.slug,
+                longitude: rawData.venue_raw.location.coordinates[0],
+                latitude: rawData.venue_raw.location.coordinates[1]
+            }
             availableVenues.push(newVenue);
         }
 

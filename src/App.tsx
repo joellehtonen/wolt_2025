@@ -1,44 +1,53 @@
 import './index.css'
 import { Button } from './components/Button'
-import { Input } from './components/Input'
+import { InputField } from './components/InputField'
+import { VenueInputField } from './components/VenueInputField'
 import React, { useState, useEffect } from 'react'
 import { fetchVenueStaticData } from './services/fetchVenueStaticData'
 
-type Venue = {
+export type Venue = {
     name: string,
+    slug: string,
+    longitude: number,
     latitude: number,
-    longitude: number
 }
 
 function App() {
-    const [venue, setVenue] = useState('Select your venue');
-    const [cartValue, setCartValue] = useState('Insert cart value');
-    const [latitude, setLatitude] = useState('Insert your latitude');
-    const [longitude, setLongitude] = useState('Insert your longitude');
+    const [venue, setVenue] = useState('');
+    const [cartValue, setCartValue] = useState('');
+    const [latitude, setLatitude] = useState('');
+    const [longitude, setLongitude] = useState('');
     const [loading, setLoading] = useState(false);
-    const [availableVenues, setAvailableVenues] = useState<Venue>([])
-    const venueSlugs = [
+    const [availableVenues, setAvailableVenues] = useState<Venue[]>([])
+    const possibleVenues = [
         'home-assignment-venue-helsinki',
         'home-assignment-venue-tallinn'
     ]
 
     useEffect(() => {
-        fetchVenueStaticData(venueSlugs)
+        fetchVenueStaticData(possibleVenues)
             .then(setAvailableVenues)
             .catch(console.error)
     }, [])
 
-    const handleClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log('CLICK');
+    console.log('Available venues:', availableVenues);
 
-        if (event.target.value === event.target.defaultValue) {
-            event.target.value = '';
-        }
+    // const handleClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     console.log('CLICK');
+    // }
+
+    const onLocationClick = () => {
+
+    }
+
+    const onCalculationClick = () => {
+
     }
 
     const handleInput = (event: React.ChangeEvent<HTMLInputElement>, field: string) => {
         switch (field) {
             case 'venue':
+                
                 setVenue(event.target.value);
                 break;
             case 'cart':
@@ -57,12 +66,16 @@ function App() {
         <div className='min-h-screen min-w-screen bg-[#00C2E8]'>
             <h1 className='text-white flex justify-center p-5'>Delivery Order Price Calculator</h1>
             <div className='grid grid-cols-5 gap-1'>
-                <Input label='venueSlug' text='Venue' value={venue} pattern='^[A-Za-z]+$' onChange={(e) => handleInput(e, 'venue')} onClick={handleClick} />
-                <Input label='cartValue' text='Cart value' value={cartValue} pattern='^[A-Za-z0-9]+$' onChange={(e) => handleInput(e, 'cart')} onClick={handleClick} />
-                <Input label='userLatitude' text='Latitude' value={latitude} pattern='^[A-Za-z0-9]+$' onChange={(e) => handleInput(e, 'latitude')} onClick={handleClick} />
-                <Input label='userLongitude' text='Longitude' value={longitude} pattern='^[A-Za-z0-9]+$' onChange={(e) => handleInput(e, 'longitude')} onClick={handleClick} />
-                <Button text='Get location' />
-                <Button text='Calculate delivery price' />
+                <VenueInputField label='venueSlug' text='Venue' value={venue} 
+                    onChange={(e) => handleInput(e, 'venue')} />
+                <InputField label='cartValue' text='Cart value' value={cartValue} placeholder='Insert cart value' 
+                    onChange={(e) => handleInput(e, 'cart')} />
+                <InputField label='userLatitude' text='Latitude' value={latitude} placeholder='Insert your latitude' 
+                    onChange={(e) => handleInput(e, 'latitude')} />
+                <InputField label='userLongitude' text='Longitude' value={longitude} placeholder='Insert your longitude' 
+                    onChange={(e) => handleInput(e, 'longitude')} />
+                <Button text='Get location' onClick={onLocationClick}/>
+                <Button text='Calculate delivery price' onClick={onCalculationClick}/>
             </div>
         </div>
     )

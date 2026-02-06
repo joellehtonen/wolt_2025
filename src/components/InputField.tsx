@@ -2,16 +2,15 @@ type InputProps = {
     label: string;
     text: string;
     value: string;
-    pattern: string;
+    placeholder: string;
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    onClick: () => void;
 }
 
-export const Input = ({ label, text, value, pattern, onChange, onClick }: InputProps) => {
+export const InputField = ({ label, text, value, placeholder, onChange }: InputProps) => {
     return (
         <>
             <label htmlFor={label} className='flex col-start-2 items-center justify-end-safe text-white'>{text}</label>
-            <input id={label} type='text' value={value} pattern={pattern} onChange={onChange} onClick={onClick}
+            <input id={label} type='text' value={value} placeholder={placeholder} pattern='^[A-Za-z0-9]+$' onChange={onChange}
                 className='col-start-3 border-1 border-black rounded m-1 pl-1 text-gray-700 bg-white' />
         </>
     )
