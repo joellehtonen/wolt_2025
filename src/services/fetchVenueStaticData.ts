@@ -21,7 +21,6 @@ export const fetchVenueStaticData = async (venueSlugs: string[]) => {
             }
             availableVenues.push(newVenue);
         }
-
         return availableVenues;
     }
     catch (error) {

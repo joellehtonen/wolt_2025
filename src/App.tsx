@@ -5,6 +5,7 @@ import { VenueInputField } from './components/VenueInputField';
 import React, { useState, useEffect } from 'react';
 import { fetchVenueStaticData } from './services/fetchVenueStaticData';
 import { calculateDistance } from './functions/calculateDistance';
+import { fetchVenueDynamicData } from './services/fetchVenueDynamicData';
 
 export type Venue = {
     name: string,
@@ -14,7 +15,8 @@ export type Venue = {
 }
 
 function App() {
-    const [venue, setVenue] = useState<Venue>();
+    const [venue, setVenue] = useState<Venue | null>(null);
+    const [venueInput, setVenueInput] = useState('');
     const [cartValue, setCartValue] = useState('');
     const [latitude, setLatitude] = useState('');
     const [longitude, setLongitude] = useState('');
@@ -34,16 +36,16 @@ function App() {
             .catch(console.error)
     }, [])
 
-    // console.log('Available venues:', availableVenues);
+    console.log('Available venues:', availableVenues);
 
     // const handleClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     //     console.log('CLICK');
     // }
 
-    // const handleVenueOptionClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     setVenue(event.target.value);
-    //     console.log('VENUE:', venue);
-    // }
+    const handleVenueOptionClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setVenue(event.target.value);
+        console.log('CHOSEN VENUE:', venue);
+    }
 
     const onLocationClick = () => {
 
@@ -51,17 +53,20 @@ function App() {
 
     const onCalculationClick = () => {
         if (venue && latitude && longitude) {
+            fetchVenueDynamicData(venue.slug);
             setDistance(calculateDistance(venue, Number(latitude), Number(longitude)));
-            setPrice();
+            //setPrice();
         }
     }
 
     const handleInput = (event: React.ChangeEvent<HTMLInputElement>, field: string) => {
         switch (field) {
             case 'venue':
-                const newVenue = availableVenues.find(v => v.name === event.target.value);
-                setVenue(newVenue);
-                console.log('VENUE:', venue);
+                setVenueInput(event.target.value);
+                const match = availableVenues.find(v => v.name === event.target.value);
+                if (match)
+                    setVenue(match);
+                console.log('venue:', venue);
                 break;
             case 'cart':
                 setCartValue(event.target.value);
@@ -79,8 +84,8 @@ function App() {
         <div className='min-h-screen min-w-screen bg-[#00C2E8]'>
             <h1 className='text-white flex justify-center p-5'>Delivery Order Price Calculator</h1>
             <div className='grid grid-cols-5 relative gap-1'>
-                <VenueInputField label='venueSlug' text='Venue' value={venue} 
-                    onChange={(e) => handleInput(e, 'venue')} />
+                <VenueInputField label='venueSlug' text='Venue' value={venueInput} venues={availableVenues}
+                    onChange={(e) => handleInput(e, 'venue')} onSelect={handleVenueOptionClick}/>
                 <InputField label='cartValue' text='Cart value' value={cartValue} placeholder='Insert cart value' 
                     onChange={(e) => handleInput(e, 'cart')} />
                 <InputField label='userLatitude' text='Latitude' value={latitude} placeholder='Insert your latitude' 
@@ -90,7 +95,8 @@ function App() {
                 <Button text='Get location' onClick={onLocationClick}/>
                 <Button text='Calculate delivery price' onClick={onCalculationClick}/>
             </div>
-            {price && <PriceBreakdown cartValue={Number(cartValue)} distance={distance} />}
+            {/* {price && 
+                <PriceBreakdown cartValue={Number(cartValue)} distance={distance} />} */}
         </div>
     )
 }
