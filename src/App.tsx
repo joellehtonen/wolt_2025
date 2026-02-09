@@ -5,22 +5,37 @@ import { VenueInputField } from './components/VenueInputField';
 import React, { useState, useEffect } from 'react';
 import { fetchVenueStaticData } from './services/fetchVenueStaticData';
 import { calculateDistance } from './functions/calculateDistance';
+import { calculatePrice } from './functions/calculatePrice';
 import { fetchVenueDynamicData } from './services/fetchVenueDynamicData';
 
 export type Venue = {
     name: string,
     slug: string,
     longitude: number,
-    latitude: number,
+    latitude: number
+}
+
+export type VenueInfo = {
+    minimum_order: number,
+    base_price: number,
+    distance_ranges: DistanceRanges[]
+}
+
+export type DistanceRanges = {
+    min: number,
+    max: number,
+    a: number,
+    b: number
 }
 
 function App() {
     const [venue, setVenue] = useState<Venue | null>(null);
+    const [venueInfo, setVenueInfo] = useState<VenueInfo | null>(null);
     const [venueInput, setVenueInput] = useState('');
     const [cartValue, setCartValue] = useState('');
     const [latitude, setLatitude] = useState('');
     const [longitude, setLongitude] = useState('');
-    const [distance, setDistance] = useState(0);
+    const [deliveryDistance, setDeliveryDistance] = useState(0);
     const [price, setPrice] = useState('');
     const [loading, setLoading] = useState(false);
     const [filtered, setFiltered] = useState<string[]>([])
@@ -38,12 +53,15 @@ function App() {
 
     console.log('Available venues:', availableVenues);
 
-    // const handleClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     console.log('CLICK');
-    // }
 
-    const handleVenueOptionClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setVenue(event.target.value);
+    const handleVenueOptionClick = (clickedVenue: Venue) => {
+        const rightVenue = availableVenues.find(v => v.name === clickedVenue.name);
+        console.log('clickedVenue', clickedVenue);
+        console.log('rightVenue', rightVenue);
+        if (rightVenue) {
+            setVenue(rightVenue);
+            setVenueInput(rightVenue.name);
+        }
         console.log('CHOSEN VENUE:', venue);
     }
 
@@ -53,9 +71,11 @@ function App() {
 
     const onCalculationClick = () => {
         if (venue && latitude && longitude) {
-            fetchVenueDynamicData(venue.slug);
-            setDistance(calculateDistance(venue, Number(latitude), Number(longitude)));
-            //setPrice();
+            fetchVenueDynamicData(venue.slug)
+            .then(setVenueInfo)
+            .catch(console.error);
+            setDeliveryDistance(calculateDistance(venue, Number(latitude), Number(longitude)));
+            setPrice(calculatePrice);
         }
     }
 
@@ -85,7 +105,7 @@ function App() {
             <h1 className='text-white flex justify-center p-5'>Delivery Order Price Calculator</h1>
             <div className='grid grid-cols-5 relative gap-1'>
                 <VenueInputField label='venueSlug' text='Venue' value={venueInput} venues={availableVenues}
-                    onChange={(e) => handleInput(e, 'venue')} onSelect={handleVenueOptionClick}/>
+                    onChange={(e) => handleInput(e, 'venue')} onClick={handleVenueOptionClick}/>
                 <InputField label='cartValue' text='Cart value' value={cartValue} placeholder='Insert cart value' 
                     onChange={(e) => handleInput(e, 'cart')} />
                 <InputField label='userLatitude' text='Latitude' value={latitude} placeholder='Insert your latitude' 

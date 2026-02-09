@@ -7,10 +7,10 @@ type VenueInputProps = {
     value: string;
     venues: Venue[];
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    onSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onClick: (clicked: Venue) => void;
 }
 
-export const VenueInputField = ({ label, text, value, venues, onChange, onSelect }: VenueInputProps) => {
+export const VenueInputField = ({ label, text, value, venues, onChange, onClick }: VenueInputProps) => {
     const [isOpen, setIsOpen] = useState(false)
     const [venueNames, setVenueNames] = useState<string[]>([]);
     const [filtered, setFiltered] = useState<Venue[]>([]);
@@ -52,7 +52,7 @@ export const VenueInputField = ({ label, text, value, venues, onChange, onSelect
                     <ul className='absolute top-full bg-white rounded-xl border-1 border-black'>
                         {filtered.map((v, index) => (
                             <li key={index} 
-                                onSelect={onSelect}
+                                onClick={() => {onClick(v); setIsOpen(false);}}
                                 className='text-black w-full m-1 p-1 text-sm hover:cursor-pointer'>
                                 {v.name}
                             </li>))}
