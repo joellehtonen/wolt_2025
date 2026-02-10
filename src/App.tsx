@@ -7,6 +7,7 @@ import { fetchVenueStaticData } from './services/fetchVenueStaticData';
 import { calculateDistance } from './functions/calculateDistance';
 import { calculatePrice } from './functions/calculatePrice';
 import { fetchVenueDynamicData } from './services/fetchVenueDynamicData';
+import { PriceBreakdown } from './components/PriceBreakdown';
 
 export type Venue = {
     name: string,
@@ -16,9 +17,9 @@ export type Venue = {
 }
 
 export type VenueInfo = {
-    minimum_order: number,
-    base_price: number,
-    distance_ranges: DistanceRanges[]
+    minimumOrder: number,
+    basePrice: number,
+    distanceRanges: DistanceRanges[]
 }
 
 export type DistanceRanges = {
@@ -26,6 +27,11 @@ export type DistanceRanges = {
     max: number,
     a: number,
     b: number
+}
+
+export type Price = {
+    deliveryFee: number,
+    smallOrderSurcharge: number
 }
 
 function App() {
@@ -36,9 +42,8 @@ function App() {
     const [latitude, setLatitude] = useState('');
     const [longitude, setLongitude] = useState('');
     const [deliveryDistance, setDeliveryDistance] = useState(0);
-    const [price, setPrice] = useState('');
+    const [price, setPrice] = useState<Price | null>(null);
     const [loading, setLoading] = useState(false);
-    const [filtered, setFiltered] = useState<string[]>([])
     const [availableVenues, setAvailableVenues] = useState<Venue[]>([])
     const possibleVenues = [
         'home-assignment-venue-helsinki',
@@ -61,6 +66,8 @@ function App() {
         if (rightVenue) {
             setVenue(rightVenue);
             setVenueInput(rightVenue.name);
+            fetchVenueDynamicData(rightVenue.slug)
+                .then(setVenueInfo);
         }
         console.log('CHOSEN VENUE:', venue);
     }
@@ -69,13 +76,28 @@ function App() {
 
     }
 
-    const onCalculationClick = () => {
-        if (venue && latitude && longitude) {
-            fetchVenueDynamicData(venue.slug)
-            .then(setVenueInfo)
-            .catch(console.error);
-            setDeliveryDistance(calculateDistance(venue, Number(latitude), Number(longitude)));
-            setPrice(calculatePrice);
+    const onCalculationClick = async () => {
+        if (!venue || !latitude || !longitude) 
+            return ; //produce an error to UI
+
+        try {
+            setLoading(true);
+
+            const venueDynamicData = await fetchVenueDynamicData(venue.slug);
+            const distance = calculateDistance(venue, Number(latitude), Number(longitude));
+            console.log('venueINFO in calculation click', venueDynamicData);
+            const priceCalculation = calculatePrice(venueDynamicData, distance, Number(cartValue));
+
+            setVenueInfo(venueDynamicData);
+            setDeliveryDistance(distance);
+            setPrice(priceCalculation);
+
+            console.log('distance', distance);
+            console.log('price', priceCalculation);
+            setLoading(false);
+        }
+        catch (error) {
+            console.error(error);
         }
     }
 
@@ -100,6 +122,8 @@ function App() {
         }
     }
 
+    console.log('CHOSEN VENUE:', venue);
+
     return (
         <div className='min-h-screen min-w-screen bg-[#00C2E8]'>
             <h1 className='text-white flex justify-center p-5'>Delivery Order Price Calculator</h1>
@@ -114,9 +138,11 @@ function App() {
                     onChange={(e) => handleInput(e, 'longitude')} />
                 <Button text='Get location' onClick={onLocationClick}/>
                 <Button text='Calculate delivery price' onClick={onCalculationClick}/>
+                {loading && 
+                    <h2 className='flex col-start-3 m-2 text-xl font-bold tracking-wide justify-center'>Loading</h2>}
             </div>
-            {/* {price && 
-                <PriceBreakdown cartValue={Number(cartValue)} distance={distance} />} */}
+            {price && 
+                <PriceBreakdown price={price} cartValue={Number(cartValue)} distance={deliveryDistance} />}
         </div>
     )
 }

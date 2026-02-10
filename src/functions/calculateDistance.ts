@@ -1,11 +1,5 @@
 import type { Venue } from "../App";
 
-// type CalculateDistanceProps = {
-//     venue: Venue;
-//     userLatitude: number;
-//     userLongitude: number;
-// }
-
 const degreeToRadius = (degree: number) => {
         return (degree * Math.PI) / 180;
     }
@@ -25,5 +19,8 @@ export const calculateDistance = (venue: Venue, userLatitude: number, userLongit
         * earthRadius;
     
     console.log('distance is', distance);
+    if (distance <= 0) {
+        throw Error('Delivery distance cannot be negative');
+    }
     return distance;
 }

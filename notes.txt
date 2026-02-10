@@ -1,0 +1,4 @@
+add checkmark next to venue if venue successfully fetched
+getLocation to be added
+make it look nice!
+add format checks to all the inputs

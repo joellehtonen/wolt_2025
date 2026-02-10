@@ -12,11 +12,11 @@ export const fetchVenueDynamicData = async (venueSlug: string): Promise<VenueInf
 
         const venueRawData = await response.json();
         const venueInfo: VenueInfo = {
-            minimum_order: venueRawData.venue_raw.delivery_specs.order_minimum_no_surcharge,
-            base_price: venueRawData.venue_raw.delivery_specs.delivery_pricing.base_price,
-            distance_ranges: venueRawData.venue_raw.delivery_specs.delivery_pricing.distance_ranges
+            minimumOrder: venueRawData.venue_raw.delivery_specs.order_minimum_no_surcharge,
+            basePrice: venueRawData.venue_raw.delivery_specs.delivery_pricing.base_price,
+            distanceRanges: venueRawData.venue_raw.delivery_specs.delivery_pricing.distance_ranges
         };
-        console.log('venueInfo', venueInfo);
+        console.log('venueInfo in fetch', venueInfo);
         return venueInfo;
     }
     catch (error) {
