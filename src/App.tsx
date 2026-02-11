@@ -93,7 +93,9 @@ function App() {
             setPrice(priceCalculation);
 
             console.log('distance', distance);
+            console.log('distance in set', deliveryDistance);
             console.log('price', priceCalculation);
+            console.log('price in state', price);
             setLoading(false);
         }
         catch (error) {
@@ -123,6 +125,8 @@ function App() {
     }
 
     console.log('CHOSEN VENUE:', venue);
+    console.log('cartValue', cartValue);
+    console.log('distance', deliveryDistance);
 
     return (
         <div className='min-h-screen min-w-screen bg-[#00C2E8]'>
@@ -140,9 +144,9 @@ function App() {
                 <Button text='Calculate delivery price' onClick={onCalculationClick}/>
                 {loading && 
                     <h2 className='flex col-start-3 m-2 text-xl font-bold tracking-wide justify-center'>Loading</h2>}
+                {price && 
+                    <PriceBreakdown price={price} cartValue={Number(cartValue)} distance={deliveryDistance} />}
             </div>
-            {price && 
-                <PriceBreakdown price={price} cartValue={Number(cartValue)} distance={deliveryDistance} />}
         </div>
     )
 }
