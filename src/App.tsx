@@ -1,13 +1,14 @@
 import './index.css';
+import React, { useState, useEffect } from 'react';
 import { Button } from './components/Button';
 import { InputField } from './components/InputField';
 import { VenueInputField } from './components/VenueInputField';
-import React, { useState, useEffect } from 'react';
+import { PriceBreakdown } from './components/PriceBreakdown';
+import { Header } from './components/Header';
 import { fetchVenueStaticData } from './services/fetchVenueStaticData';
 import { calculateDistance } from './functions/calculateDistance';
 import { calculatePrice } from './functions/calculatePrice';
 import { fetchVenueDynamicData } from './services/fetchVenueDynamicData';
-import { PriceBreakdown } from './components/PriceBreakdown';
 
 export type Venue = {
     name: string,
@@ -38,7 +39,8 @@ function App() {
     const [venue, setVenue] = useState<Venue | null>(null);
     const [venueInfo, setVenueInfo] = useState<VenueInfo | null>(null);
     const [venueInput, setVenueInput] = useState('');
-    const [cartValue, setCartValue] = useState('');
+    const [cartValueInput, setCartValueInput] = useState('');
+    const [cartValueLocked, setCartValueLocked] = useState(0);
     const [latitude, setLatitude] = useState('');
     const [longitude, setLongitude] = useState('');
     const [deliveryDistance, setDeliveryDistance] = useState(0);
@@ -77,16 +79,19 @@ function App() {
     }
 
     const onCalculationClick = async () => {
-        if (!venue || !latitude || !longitude) 
-            return ; //produce an error to UI
-
         try {
+            if (!venue || !latitude || !longitude) 
+                throw Error('Something missing'); //produce an error to UI
+            if (!cartValueInput) 
+                throw Error('Cartvalue missing'); //produce an error to UI
+
             setLoading(true);
+            setCartValueLocked(Number(cartValueInput));
 
             const venueDynamicData = await fetchVenueDynamicData(venue.slug);
             const distance = calculateDistance(venue, Number(latitude), Number(longitude));
             console.log('venueINFO in calculation click', venueDynamicData);
-            const priceCalculation = calculatePrice(venueDynamicData, distance, Number(cartValue));
+            const priceCalculation = calculatePrice(venueDynamicData, distance, cartValueLocked);
 
             setVenueInfo(venueDynamicData);
             setDeliveryDistance(distance);
@@ -113,7 +118,7 @@ function App() {
                 console.log('venue:', venue);
                 break;
             case 'cart':
-                setCartValue(event.target.value);
+                setCartValueInput(event.target.value);
                 break;
             case 'latitude':
                 setLatitude(event.target.value);
@@ -125,27 +130,29 @@ function App() {
     }
 
     console.log('CHOSEN VENUE:', venue);
-    console.log('cartValue', cartValue);
+    console.log('cartValue', cartValueLocked);
     console.log('distance', deliveryDistance);
 
     return (
-        <div className='min-h-screen min-w-screen bg-[#00C2E8]'>
-            <h1 className='text-white flex justify-center p-5'>Delivery Order Price Calculator</h1>
-            <div className='grid grid-cols-5 relative gap-1'>
+        <div className='min-h-screen min-w-screen bg-[#2D68C4]'>
+            <Header text='Delivery Order Price Calculator'></Header>
+            <div className='grid grid-cols-5 grid-rows-5 relative gap-1'>
                 <VenueInputField label='venueSlug' text='Venue' value={venueInput} venues={availableVenues}
                     onChange={(e) => handleInput(e, 'venue')} onClick={handleVenueOptionClick}/>
-                <InputField label='cartValue' text='Cart value' value={cartValue} placeholder='Insert cart value' 
+                <InputField label='cartValue' text='Cart value' value={cartValueInput} placeholder='Insert cart value' 
                     onChange={(e) => handleInput(e, 'cart')} />
                 <InputField label='userLatitude' text='Latitude' value={latitude} placeholder='Insert your latitude' 
-                    onChange={(e) => handleInput(e, 'latitude')} />
+                    onChange={(e) => handleInput(e, 'latitude')} className='' />
                 <InputField label='userLongitude' text='Longitude' value={longitude} placeholder='Insert your longitude' 
-                    onChange={(e) => handleInput(e, 'longitude')} />
-                <Button text='Get location' onClick={onLocationClick}/>
-                <Button text='Calculate delivery price' onClick={onCalculationClick}/>
+                    onChange={(e) => handleInput(e, 'longitude')} className='' />
+                <Button text='Get location' onClick={onLocationClick} 
+                    className='row-start-3 col-start-4 row-span-2 m-7' />
+                <Button text='Calculate delivery price' onClick={onCalculationClick}
+                    className='col-start-3 !bg-[#50C878]' />
                 {loading && 
-                    <h2 className='flex col-start-3 m-2 text-xl font-bold tracking-wide justify-center'>Loading</h2>}
-                {price && 
-                    <PriceBreakdown price={price} cartValue={Number(cartValue)} distance={deliveryDistance} />}
+                    <h2 className='font-["Oswald"] uppercase text-shadow-lg/20 flex col-start-3 m-2 text-2xl text-white tracking-wider justify-center'>Loading...</h2>}
+                {price && !loading && 
+                    <PriceBreakdown price={price} cartValue={cartValueLocked} distance={deliveryDistance} />}
             </div>
         </div>
     )

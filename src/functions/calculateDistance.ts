@@ -22,5 +22,6 @@ export const calculateDistance = (venue: Venue, userLatitude: number, userLongit
     if (distance <= 0) {
         throw Error('Delivery distance cannot be negative');
     }
-    return distance;
+
+    return Math.round(distance);
 }

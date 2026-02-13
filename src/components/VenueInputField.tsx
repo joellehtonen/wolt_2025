@@ -43,13 +43,13 @@ export const VenueInputField = ({ label, text, value, venues, onChange, onClick 
 
     return (
         <>
-            <label htmlFor={label} className='flex col-start-2 items-center justify-end-safe text-white'>{text}</label>
-            <div className='col-start-3 relative'>
+            <label htmlFor={label} className='font-["Overpass"] tracking-wide text-shadow-lg flex col-start-2 items-center justify-end-safe text-white'>{text}</label>
+            <div className='flex col-start-3 items-center relative'>
                 <input id={label} type='text' value={value} placeholder='Select the venue' pattern='^[A-Za-z]+$' 
                     onChange={onChange}
-                    className='border-1 border-black rounded m-1 pl-1 text-black bg-white' />
+                    className='rounded m-1 pl-1 text-black bg-white' />
                 {isOpen && (
-                    <ul className='absolute top-full bg-white rounded-xl border-1 border-black'>
+                    <ul className='absolute top-full bg-white rounded-xl ring-2 ring-black shadow-lg'>
                         {filtered.map((v, index) => (
                             <li key={index} 
                                 onClick={() => {onClick(v); setIsOpen(false);}}
